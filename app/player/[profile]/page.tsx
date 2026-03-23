@@ -99,7 +99,7 @@ export default async function PlayerPage({
           {/* Mobile list */}
           <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
             {/* Header */}
-            <div className="grid grid-cols-[1fr_4rem_4rem_4rem] gap-x-2 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
+            <div className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
               <div>Opponent</div>
               <div className="text-center">Win%</div>
               <div className="text-center">Loss%</div>
@@ -108,7 +108,7 @@ export default async function PlayerPage({
             {/* Rows */}
             <div className="divide-y divide-zinc-800">
               {opponents.map((opp) => (
-                <div key={opp.profile} className="grid grid-cols-[1fr_4rem_4rem_4rem] gap-x-2 items-center bg-zinc-900 px-4 py-3">
+                <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 items-center bg-zinc-900 px-4 py-3">
                   <div className="min-w-0">
                     <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                       {opp.name}
