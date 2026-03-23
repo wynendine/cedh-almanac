@@ -97,34 +97,26 @@ export default async function PlayerPage({
           <h2 className="mb-3 text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
 
           {/* Mobile cards */}
-          <div className="sm:hidden space-y-2">
+          <div className="sm:hidden space-y-px rounded-lg overflow-hidden border border-zinc-800">
             {opponents.map((opp) => (
-              <div key={opp.profile} className="rounded-lg bg-zinc-900 px-4 py-3">
-                <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 block mb-2">
-                  {opp.name}
-                </a>
-                <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                  <div>
-                    <div className="text-green-400 font-bold text-base">{opp.wins}</div>
-                    <div className="text-zinc-500">W</div>
-                  </div>
-                  <div>
-                    <div className="text-red-400 font-bold text-base">{opp.losses}</div>
-                    <div className="text-zinc-500">L</div>
-                  </div>
-                  <div>
-                    <div className="text-yellow-400 font-bold text-base">{opp.draws}</div>
-                    <div className="text-zinc-500">D</div>
-                  </div>
-                  <div>
-                    <div className="text-zinc-300 font-bold text-base">{opp.games}</div>
-                    <div className="text-zinc-500">Games</div>
+              <div key={opp.profile} className="flex items-center justify-between bg-zinc-900 px-4 py-3 gap-4">
+                <div className="min-w-0">
+                  <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
+                    {opp.name}
+                  </a>
+                  <div className="mt-0.5 text-xs text-zinc-500">
+                    <span className="text-green-400">{opp.wins}W</span>
+                    {" · "}
+                    <span className="text-red-400">{opp.losses}L</span>
+                    {" · "}
+                    <span className="text-yellow-400">{opp.draws}D</span>
+                    {" · "}
+                    {opp.games} games
                   </div>
                 </div>
-                <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-zinc-400">
-                  <div>Win% <span className="text-white">{pct(opp.winPct)}</span></div>
-                  <div>Loss% <span className="text-white">{pct(opp.lossPct)}</span></div>
-                  <div>Draw% <span className="text-white">{pct(opp.drawPct)}</span></div>
+                <div className="text-right shrink-0">
+                  <div className="text-indigo-400 font-semibold">{pct(opp.winPct)}</div>
+                  <div className="text-xs text-zinc-500">win rate</div>
                 </div>
               </div>
             ))}
