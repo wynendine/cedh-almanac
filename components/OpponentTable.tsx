@@ -72,15 +72,15 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
     <>
       {/* Mobile list */}
       <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
-        <div className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 bg-zinc-800 px-4 py-2 text-xs">
+        <div className="grid grid-cols-[1fr_3rem_3rem_3rem] bg-zinc-800 px-4 py-2 text-xs">
           <div className="text-zinc-400">Opponent</div>
-          <div>{colHeader("Win%", "winPct")}</div>
-          <div>{colHeader("Loss%", "lossPct")}</div>
-          <div>{colHeader("Draw%", "drawPct")}</div>
+          <div className="border-l border-zinc-700 pl-2">{colHeader("Win%", "winPct")}</div>
+          <div className="border-l border-zinc-700 pl-2">{colHeader("Loss%", "lossPct")}</div>
+          <div className="border-l border-zinc-700 pl-2">{colHeader("Draw%", "drawPct")}</div>
         </div>
         <div className="divide-y divide-zinc-800">
           {sorted.map((opp) => (
-            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 items-center bg-zinc-900 px-4 py-3">
+            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] items-center bg-zinc-900 px-4 py-3">
               <div className="min-w-0">
                 <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                   {opp.name}
@@ -95,9 +95,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
                   <span className="text-sm font-semibold">{opp.games} games</span>
                 </div>
               </div>
-              <div className="text-center text-sm font-semibold">{pct(opp.winPct)}</div>
-              <div className="text-center text-sm font-semibold">{pct(opp.lossPct)}</div>
-              <div className="text-center text-sm font-semibold">{pct(opp.drawPct)}</div>
+              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.winPct)}</div>
+              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.lossPct)}</div>
+              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.drawPct)}</div>
             </div>
           ))}
         </div>
