@@ -1,31 +1,8 @@
 import { notFound } from "next/navigation";
-
-interface SeatStats {
-  wins: number;
-  games: number;
-  winRate: number | null;
-}
-
-interface OpponentStats {
-  name: string;
-  profile: string;
-  wins: number;
-  losses: number;
-  draws: number;
-  games: number;
-  winPct: number | null;
-  lossPct: number | null;
-  drawPct: number | null;
-}
-
-interface PlayerStats {
-  profile: string;
-  name: string;
-  overall: { wins: number; losses: number; draws: number; winRate: number | null };
-  byseat: Record<string, SeatStats>;
-  opponents: OpponentStats[];
-  cachedAt: string;
-}
+import { getPlayer } from "@/lib/edhtop16";
+import { getRoundsBatch } from "@/lib/topdeck";
+import { computeStats, PlayerStats } from "@/lib/compute";
+import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
 
 function pct(n: number | null) {
   if (n === null) return "—";
@@ -33,12 +10,26 @@ function pct(n: number | null) {
 }
 
 async function fetchStats(profile: string): Promise<PlayerStats | null> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/player/${profile}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
+  const cached = await getCachedPlayer(profile);
+  if (cached) return cached;
+
+  const player = await getPlayer(profile);
+  if (!player) return null;
+
+  const tids = player.entries.map((e) => e.tournament.TID);
+  const roundsByTid = await getRoundsBatch(tids);
+  const stats = computeStats(profile, player.name, roundsByTid);
+
+  if (stats.overall.wins === 0 && stats.overall.losses === 0) {
+    stats.overall.wins = player.wins;
+    stats.overall.losses = player.losses;
+    stats.overall.draws = player.draws;
+    const total = player.wins + player.losses + player.draws;
+    stats.overall.winRate = total > 0 ? player.wins / total : null;
+  }
+
+  await setCachedPlayer(stats);
+  return stats;
 }
 
 export default async function PlayerPage({
@@ -57,11 +48,14 @@ export default async function PlayerPage({
     <main className="min-h-screen bg-zinc-950 px-4 py-12 text-white">
       <div className="mx-auto max-w-4xl space-y-10">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">{stats.name}</h1>
-          <p className="mt-1 text-zinc-400">
-            {totalGames} games · {pct(overall.winRate)} win rate
-          </p>
+        <div className="flex items-center gap-4">
+          <a href="/" className="text-zinc-500 hover:text-white text-sm">← Search</a>
+          <div>
+            <h1 className="text-3xl font-bold">{stats.name}</h1>
+            <p className="mt-1 text-zinc-400">
+              {totalGames} games · {pct(overall.winRate)} win rate
+            </p>
+          </div>
         </div>
 
         {/* Overall */}
@@ -117,7 +111,7 @@ export default async function PlayerPage({
               </thead>
               <tbody className="divide-y divide-zinc-800">
                 {opponents.map((opp) => (
-                  <tr key={opp.profile} className="hover:bg-zinc-900 cursor-pointer" onClick={() => {}}>
+                  <tr key={opp.profile} className="hover:bg-zinc-900">
                     <td className="px-4 py-2 font-medium">
                       <a href={`/player/${opp.profile}`} className="hover:text-indigo-400">
                         {opp.name}
