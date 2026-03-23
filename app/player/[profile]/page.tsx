@@ -3,6 +3,7 @@ import { getPlayer } from "@/lib/edhtop16";
 import { getRoundsBatch } from "@/lib/topdeck";
 import { computeStats, PlayerStats } from "@/lib/compute";
 import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
+import OpponentTable from "@/components/OpponentTable";
 
 function pct(n: number | null) {
   if (n === null) return "—";
@@ -96,77 +97,7 @@ export default async function PlayerPage({
         {/* Opponents */}
         <section>
           <h2 className="mb-3 text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
-
-          {/* Mobile list */}
-          <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
-            {/* Header */}
-            <div className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
-              <div>Opponent</div>
-              <div className="text-center">Win%</div>
-              <div className="text-center">Loss%</div>
-              <div className="text-center">Draw%</div>
-            </div>
-            {/* Rows */}
-            <div className="divide-y divide-zinc-800">
-              {opponents.map((opp) => (
-                <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] gap-x-2 items-center bg-zinc-900 px-4 py-3">
-                  <div className="min-w-0">
-                    <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
-                      {opp.name}
-                    </a>
-                    <div className="mt-0.5 text-xs text-white">
-                      <span className="text-green-400 text-sm font-semibold">{opp.wins}W</span>
-                      {" · "}
-                      <span className="text-red-400 text-sm font-semibold">{opp.losses}L</span>
-                      {" · "}
-                      <span className="text-yellow-400 text-sm font-semibold">{opp.draws}D</span>
-                      {" · "}
-                      {opp.games} games
-                    </div>
-                  </div>
-                  <div className="text-center text-sm font-semibold">{pct(opp.winPct)}</div>
-                  <div className="text-center text-sm font-semibold">{pct(opp.lossPct)}</div>
-                  <div className="text-center text-sm font-semibold">{pct(opp.drawPct)}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop table */}
-          <div className="hidden sm:block overflow-x-auto rounded-lg border border-zinc-800">
-            <table className="w-full text-sm">
-              <thead className="bg-zinc-900 text-zinc-400">
-                <tr>
-                  <th className="px-4 py-3 text-left">Opponent</th>
-                  <th className="px-4 py-3 text-right">W</th>
-                  <th className="px-4 py-3 text-right">L</th>
-                  <th className="px-4 py-3 text-right">D</th>
-                  <th className="px-4 py-3 text-right">Games</th>
-                  <th className="px-4 py-3 text-right">Win%</th>
-                  <th className="px-4 py-3 text-right">Loss%</th>
-                  <th className="px-4 py-3 text-right">Draw%</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {opponents.map((opp) => (
-                  <tr key={opp.profile} className="hover:bg-zinc-900">
-                    <td className="px-4 py-2 font-medium">
-                      <a href={`/player/${opp.profile}`} className="hover:text-indigo-400">
-                        {opp.name}
-                      </a>
-                    </td>
-                    <td className="px-4 py-2 text-right text-green-400">{opp.wins}</td>
-                    <td className="px-4 py-2 text-right text-red-400">{opp.losses}</td>
-                    <td className="px-4 py-2 text-right text-yellow-400">{opp.draws}</td>
-                    <td className="px-4 py-2 text-right text-zinc-400">{opp.games}</td>
-                    <td className="px-4 py-2 text-right">{pct(opp.winPct)}</td>
-                    <td className="px-4 py-2 text-right">{pct(opp.lossPct)}</td>
-                    <td className="px-4 py-2 text-right">{pct(opp.drawPct)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <OpponentTable opponents={opponents} />
           <p className="mt-2 text-xs text-zinc-600">
             Cached {new Date(stats.cachedAt).toLocaleString()}
           </p>
