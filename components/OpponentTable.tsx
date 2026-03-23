@@ -74,9 +74,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
       <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
         <div className="grid grid-cols-[1fr_3rem_3rem_3rem] bg-zinc-800 px-4 py-2 text-xs">
           <div className="text-zinc-400">Opponent</div>
-          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Win%", "winPct")}</div>
-          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Loss%", "lossPct")}</div>
-          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Draw%", "drawPct")}</div>
+          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Win %", "winPct")}</div>
+          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Loss %", "lossPct")}</div>
+          <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Draw %", "drawPct")}</div>
         </div>
         <div className="divide-y divide-zinc-700">
           {sorted.map((opp) => (
@@ -114,13 +114,13 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
               <th className="px-4 py-3 text-right">D</th>
               <th className="px-4 py-3 text-right">Games</th>
               <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("winPct")}>
-                Win%{sortCol === "winPct" ? arrow(sortDir) : ""}
+                Win %{sortCol === "winPct" ? arrow(sortDir) : ""}
               </th>
               <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("lossPct")}>
-                Loss%{sortCol === "lossPct" ? arrow(sortDir) : ""}
+                Loss %{sortCol === "lossPct" ? arrow(sortDir) : ""}
               </th>
               <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("drawPct")}>
-                Draw%{sortCol === "drawPct" ? arrow(sortDir) : ""}
+                Draw %{sortCol === "drawPct" ? arrow(sortDir) : ""}
               </th>
             </tr>
           </thead>
