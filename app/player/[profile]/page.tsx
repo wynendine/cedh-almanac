@@ -5,6 +5,28 @@ import { computeStats, PlayerStats } from "@/lib/compute";
 import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
 import { pct } from "@/lib/utils";
 import OpponentTable from "@/components/OpponentTable";
+import SearchBox from "@/components/SearchBox";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ profile: string }>;
+}) {
+  const { profile } = await params;
+  const cached = await getCachedPlayer(profile);
+  const name = cached?.name ?? "Player";
+  const wins = cached?.overall.wins ?? 0;
+  const losses = cached?.overall.losses ?? 0;
+  const draws = cached?.overall.draws ?? 0;
+  const total = wins + losses + draws;
+  const winRate = total > 0 ? `${((wins / total) * 100).toFixed(1)}% win rate` : "";
+  const description = [winRate, `${total} games played`].filter(Boolean).join(" · ");
+  return {
+    title: `${name} — cEDH Almanac`,
+    description,
+    openGraph: { title: `${name} — cEDH Almanac`, description },
+  };
+}
 
 async function fetchStats(profile: string): Promise<PlayerStats | null> {
   const cached = await getCachedPlayer(profile);
@@ -38,19 +60,19 @@ export default async function PlayerPage({
   const stats = await fetchStats(profile);
   if (!stats) notFound();
 
-  const { overall, byseat } = stats;
-  const opponents = stats.opponents.filter((o) => o.games >= 3);
+  const { overall, byseat, opponents } = stats;
   const totalGames = overall.wins + overall.losses + overall.draws;
 
   return (
     <main className="min-h-screen bg-zinc-950 px-4 py-12 text-white">
       <div className="mx-auto max-w-4xl space-y-10">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <a href="/" className="text-zinc-500 hover:text-white text-sm">← Search</a>
-          <div>
-            <h1 className="text-3xl font-bold">{stats.name}</h1>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <a href="/" className="text-zinc-500 hover:text-white text-sm shrink-0">← Search</a>
+            <SearchBox />
           </div>
+          <h1 className="text-3xl font-bold">{stats.name}</h1>
         </div>
 
         {/* Overall */}

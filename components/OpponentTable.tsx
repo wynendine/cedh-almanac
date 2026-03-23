@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { pct } from "@/lib/utils";
 
 interface Opponent {
   profile: string;
@@ -17,7 +18,7 @@ interface Opponent {
 type SortCol = "winPct" | "lossPct" | "drawPct";
 type SortDir = "desc" | "asc" | null;
 
-import { pct } from "@/lib/utils";
+const MIN_GAMES_OPTIONS = [1, 3, 5];
 
 function nextDir(current: SortDir): SortDir {
   if (current === null) return "desc";
@@ -34,6 +35,7 @@ function arrow(dir: SortDir) {
 export default function OpponentTable({ opponents }: { opponents: Opponent[] }) {
   const [sortCol, setSortCol] = useState<SortCol | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
+  const [minGames, setMinGames] = useState(3);
 
   function handleSort(col: SortCol) {
     if (sortCol === col) {
@@ -46,12 +48,15 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
     }
   }
 
-  const sorted = [...opponents].sort((a, b) => {
-    if (!sortCol || !sortDir) return 0;
-    const av = a[sortCol] ?? -1;
-    const bv = b[sortCol] ?? -1;
-    return sortDir === "desc" ? bv - av : av - bv;
-  });
+  const sorted = useMemo(() => {
+    const filtered = opponents.filter((o) => o.games >= minGames);
+    if (!sortCol || !sortDir) return filtered;
+    return [...filtered].sort((a, b) => {
+      const av = a[sortCol] ?? -1;
+      const bv = b[sortCol] ?? -1;
+      return sortDir === "desc" ? bv - av : av - bv;
+    });
+  }, [opponents, minGames, sortCol, sortDir]);
 
   function colHeader(label: string, col: SortCol) {
     const active = sortCol === col;
@@ -65,8 +70,28 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
     );
   }
 
+  const emptyMessage = `No opponents with ${minGames}+ games played together.`;
+
   return (
     <>
+      {/* Min games filter */}
+      <div className="mb-3 flex items-center gap-2 text-sm text-zinc-400">
+        <span>Min games:</span>
+        {MIN_GAMES_OPTIONS.map((n) => (
+          <button
+            key={n}
+            onClick={() => setMinGames(n)}
+            className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
+              minGames === n
+                ? "bg-indigo-600 text-white"
+                : "bg-zinc-800 text-zinc-400 hover:text-white"
+            }`}
+          >
+            {n}+
+          </button>
+        ))}
+      </div>
+
       {/* Mobile list */}
       <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
         <div className="grid grid-cols-[1fr_3rem_3rem_3rem] bg-zinc-800 px-4 py-2 text-xs">
@@ -78,7 +103,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
         <div className="divide-y divide-zinc-700">
           {sorted.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-zinc-500">
-              No opponents with 3+ games played together.
+              {emptyMessage}
             </div>
           )}
           {sorted.map((opp) => (
@@ -130,7 +155,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
             {sorted.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-4 py-6 text-center text-sm text-zinc-500">
-                  No opponents with 3+ games played together.
+                  {emptyMessage}
                 </td>
               </tr>
             )}
