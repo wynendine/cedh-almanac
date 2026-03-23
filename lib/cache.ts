@@ -1,8 +1,7 @@
-import { kv } from "@vercel/kv";
+import { put, list, del } from "@vercel/blob";
 import { PlayerStats } from "./compute";
 
-const PLAYER_TTL = 60 * 60 * 6; // 6 hours
-const INDEX_TTL = 60 * 60 * 25; // 25 hours
+const PLAYER_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export interface PlayerIndexEntry {
   name: string;
@@ -10,9 +9,16 @@ export interface PlayerIndexEntry {
   tournaments: number;
 }
 
+// --- Player stats cache ---
+
 export async function getCachedPlayer(profile: string): Promise<PlayerStats | null> {
   try {
-    return await kv.get<PlayerStats>(`player:${profile}`);
+    const { blobs } = await list({ prefix: `player-${profile}` });
+    if (!blobs.length) return null;
+    const blob = blobs[0];
+    if (Date.now() - new Date(blob.uploadedAt).getTime() > PLAYER_TTL_MS) return null;
+    const res = await fetch(blob.url);
+    return res.json();
   } catch {
     return null;
   }
@@ -20,20 +26,29 @@ export async function getCachedPlayer(profile: string): Promise<PlayerStats | nu
 
 export async function setCachedPlayer(stats: PlayerStats): Promise<void> {
   try {
-    await kv.set(`player:${stats.profile}`, stats, { ex: PLAYER_TTL });
+    const { blobs } = await list({ prefix: `player-${stats.profile}` });
+    if (blobs.length) await del(blobs.map((b) => b.url));
+    await put(`player-${stats.profile}.json`, JSON.stringify(stats), { access: "public" });
   } catch {
-    // fail silently — cache is best-effort
+    // fail silently
   }
 }
 
+// --- Player search index ---
+
 export async function getPlayerIndex(): Promise<PlayerIndexEntry[]> {
   try {
-    return (await kv.get<PlayerIndexEntry[]>("index:players")) ?? [];
+    const { blobs } = await list({ prefix: "index-players" });
+    if (!blobs.length) return [];
+    const res = await fetch(blobs[0].url);
+    return res.json();
   } catch {
     return [];
   }
 }
 
 export async function setPlayerIndex(entries: PlayerIndexEntry[]): Promise<void> {
-  await kv.set("index:players", entries, { ex: INDEX_TTL });
+  const { blobs } = await list({ prefix: "index-players" });
+  if (blobs.length) await del(blobs.map((b) => b.url));
+  await put("index-players.json", JSON.stringify(entries), { access: "public" });
 }
