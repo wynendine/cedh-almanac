@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 interface Result {
@@ -13,6 +13,7 @@ export default function SearchBox() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -34,7 +35,9 @@ export default function SearchBox() {
   function select(profile: string) {
     setOpen(false);
     setQuery("");
-    router.push(`/player/${profile}`);
+    startTransition(() => {
+      router.push(`/player/${profile}`);
+    });
   }
 
   return (
@@ -43,8 +46,9 @@ export default function SearchBox() {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search for a player..."
-        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+        placeholder={isPending ? "Loading…" : "Search for a player..."}
+        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none disabled:opacity-60"
+        disabled={isPending}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onFocus={() => results.length > 0 && setOpen(true)}
       />
