@@ -4,13 +4,8 @@ import { setPlayerIndex, PlayerIndexEntry } from "@/lib/cache";
 
 export const maxDuration = 60;
 
-export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET && process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const playerMap: Record<string, { name: string; tournaments: number }> = {};
+export async function POST(_req: NextRequest) {
+const playerMap: Record<string, { name: string; tournaments: number }> = {};
   let cursor: string | null = null;
   let hasNext = true;
   let pages = 0;
