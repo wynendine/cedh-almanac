@@ -54,27 +54,34 @@ export default async function PlayerPage({
           <a href="/" className="text-zinc-500 hover:text-white text-sm">← Search</a>
           <div>
             <h1 className="text-3xl font-bold">{stats.name}</h1>
-            <p className="mt-1 text-zinc-400">{totalGames} games played</p>
           </div>
         </div>
 
         {/* Overall */}
         <section>
           <h2 className="mb-3 text-lg font-semibold text-zinc-300">Overall Record</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label: "Wins", value: overall.wins, color: "text-green-400" },
-              { label: "Losses", value: overall.losses, color: "text-red-400" },
-              { label: "Draws", value: overall.draws, color: "text-yellow-400" },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="rounded-lg bg-zinc-900 p-4 text-center">
-                <div className={`text-3xl font-bold ${color}`}>{value}</div>
-                <div className="mt-1 text-sm text-zinc-400">{label}</div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: "Wins", value: overall.wins, color: "text-green-400" },
+                { label: "Losses", value: overall.losses, color: "text-red-400" },
+                { label: "Draws", value: overall.draws, color: "text-yellow-400" },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="rounded-lg bg-zinc-900 p-4 text-center">
+                  <div className={`text-3xl font-bold ${color}`}>{value}</div>
+                  <div className="mt-1 text-sm text-zinc-400">{label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-lg bg-zinc-900 p-4 text-center">
+                <div className="text-3xl font-bold text-indigo-400">{pct(overall.winRate)}</div>
+                <div className="mt-1 text-sm text-zinc-400">Win Rate</div>
               </div>
-            ))}
-            <div className="rounded-lg bg-zinc-900 p-4 text-center col-span-2 sm:col-span-1">
-              <div className="text-3xl font-bold text-indigo-400">{pct(overall.winRate)}</div>
-              <div className="mt-1 text-sm text-zinc-400">Win Rate</div>
+              <div className="rounded-lg bg-zinc-900 p-4 text-center">
+                <div className="text-3xl font-bold text-white">{totalGames}</div>
+                <div className="mt-1 text-sm text-zinc-400">Games Played</div>
+              </div>
             </div>
           </div>
         </section>
