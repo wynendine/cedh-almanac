@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTournamentPage } from "@/lib/edhtop16";
 import { setPlayerIndex, PlayerIndexEntry } from "@/lib/cache";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function POST(_req: NextRequest) {
   try {
@@ -14,14 +14,15 @@ export async function POST(_req: NextRequest) {
 }
 
 async function buildIndex() {
-const playerMap: Record<string, { name: string; tournaments: number }> = {};
+  const playerMap: Record<string, { name: string; tournaments: number }> = {};
   let cursor: string | null = null;
   let hasNext = true;
   let pages = 0;
-  const MAX_PAGES = 50; // ~2500 tournaments
+  const PAGE_SIZE = 100;
+  const MAX_PAGES = 120; // up to 12,000 tournaments
 
   while (hasNext && pages < MAX_PAGES) {
-    const { tournaments, hasNextPage, endCursor } = await getTournamentPage(50, cursor ?? undefined);
+    const { tournaments, hasNextPage, endCursor } = await getTournamentPage(PAGE_SIZE, cursor ?? undefined);
 
     for (const t of tournaments) {
       for (const entry of t.entries ?? []) {
@@ -30,7 +31,7 @@ const playerMap: Record<string, { name: string; tournaments: number }> = {};
         if (!playerMap[topdeckProfile]) {
           playerMap[topdeckProfile] = { name, tournaments: 0 };
         }
-        playerMap[topdeckProfile].name = name; // keep latest
+        playerMap[topdeckProfile].name = name;
         playerMap[topdeckProfile].tournaments++;
       }
     }
@@ -46,5 +47,5 @@ const playerMap: Record<string, { name: string; tournaments: number }> = {};
 
   await setPlayerIndex(entries);
 
-  return NextResponse.json({ playersIndexed: entries.length, pages });
+  return NextResponse.json({ playersIndexed: entries.length, pages, tournamentsScanned: pages * PAGE_SIZE });
 }
