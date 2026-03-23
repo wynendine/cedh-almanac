@@ -120,7 +120,7 @@ export default async function PlayerPage({
                       {" · "}
                       <span className="text-yellow-400 text-sm font-semibold">{opp.draws}D</span>
                     </div>
-                    <div className="text-xs text-white">{opp.games} games played</div>
+                    <div className="text-xs text-white">{opp.games} games</div>
                   </div>
                   <div className="text-center text-sm font-semibold">{pct(opp.winPct)}</div>
                   <div className="text-center text-sm font-semibold">{pct(opp.lossPct)}</div>
