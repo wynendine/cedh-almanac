@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getTournamentPage } from "@/lib/edhtop16";
+import { setPlayerIndex, PlayerIndexEntry } from "@/lib/cache";
+
+export const maxDuration = 60;
+
+export async function POST(req: NextRequest) {
+  const secret = req.headers.get("x-cron-secret");
+  if (secret !== process.env.CRON_SECRET && process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const playerMap: Record<string, { name: string; tournaments: number }> = {};
+  let cursor: string | null = null;
+  let hasNext = true;
+  let pages = 0;
+  const MAX_PAGES = 50; // ~2500 tournaments
+
+  while (hasNext && pages < MAX_PAGES) {
+    const { tournaments, hasNextPage, endCursor } = await getTournamentPage(50, cursor ?? undefined);
+
+    for (const t of tournaments) {
+      for (const entry of t.entries ?? []) {
+        const { topdeckProfile, name } = entry.player ?? {};
+        if (!topdeckProfile || !name) continue;
+        if (!playerMap[topdeckProfile]) {
+          playerMap[topdeckProfile] = { name, tournaments: 0 };
+        }
+        playerMap[topdeckProfile].name = name; // keep latest
+        playerMap[topdeckProfile].tournaments++;
+      }
+    }
+
+    hasNext = hasNextPage;
+    cursor = endCursor;
+    pages++;
+  }
+
+  const entries: PlayerIndexEntry[] = Object.entries(playerMap).map(
+    ([profile, { name, tournaments }]) => ({ profile, name, tournaments })
+  );
+
+  await setPlayerIndex(entries);
+
+  return NextResponse.json({ playersIndexed: entries.length, pages });
+}
