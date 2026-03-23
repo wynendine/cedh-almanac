@@ -21,6 +21,7 @@ export async function getRounds(tid: string): Promise<Round[]> {
   const res = await fetch(`${TOPDECK_URL}/${tid}/rounds`, {
     headers: { Authorization: API_KEY },
     cache: "no-store",
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) return [];
   const data = await res.json();

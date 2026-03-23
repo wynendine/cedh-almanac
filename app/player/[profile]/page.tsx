@@ -3,12 +3,8 @@ import { getPlayer } from "@/lib/edhtop16";
 import { getRoundsBatch } from "@/lib/topdeck";
 import { computeStats, PlayerStats } from "@/lib/compute";
 import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
+import { pct } from "@/lib/utils";
 import OpponentTable from "@/components/OpponentTable";
-
-function pct(n: number | null) {
-  if (n === null) return "—";
-  return `${(n * 100).toFixed(1)}%`;
-}
 
 async function fetchStats(profile: string): Promise<PlayerStats | null> {
   const cached = await getCachedPlayer(profile);

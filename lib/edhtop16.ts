@@ -1,11 +1,12 @@
 const GRAPHQL_URL = "https://edhtop16.com/api/graphql";
 
-async function gql(query: string) {
+async function gql(query: string, variables?: Record<string, unknown>) {
   const res = await fetch(GRAPHQL_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, variables }),
     cache: "no-store",
+    signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) throw new Error(`edhtop16 error: ${res.status}`);
   return res.json();
@@ -25,29 +26,35 @@ export interface PlayerInfo {
 }
 
 export async function getPlayer(profile: string): Promise<PlayerInfo | null> {
-  const data = await gql(`{
-    player(profile: "${profile}") {
-      name wins losses draws
-      entries {
-        tournament { TID name }
-        commander { name }
+  const data = await gql(
+    `query GetPlayer($profile: String!) {
+      player(profile: $profile) {
+        name wins losses draws
+        entries {
+          tournament { TID name }
+          commander { name }
+        }
       }
-    }
-  }`);
+    }`,
+    { profile }
+  );
   return data?.data?.player ?? null;
 }
 
 export async function getTournamentProfiles(
   tid: string
 ): Promise<Record<string, string>> {
-  const data = await gql(`{
-    tournament(TID: "${tid}") {
-      entries {
-        player { topdeckProfile }
-        commander { name }
+  const data = await gql(
+    `query GetTournament($tid: String!) {
+      tournament(TID: $tid) {
+        entries {
+          player { topdeckProfile }
+          commander { name }
+        }
       }
-    }
-  }`);
+    }`,
+    { tid }
+  );
   const entries = data?.data?.tournament?.entries ?? [];
   const map: Record<string, string> = {};
   for (const e of entries) {
@@ -67,20 +74,22 @@ export async function getTournamentPage(
   first: number,
   after?: string
 ): Promise<{ tournaments: TournamentListEntry[]; hasNextPage: boolean; endCursor: string | null }> {
-  const cursor = after ? `, after: "${after}"` : "";
-  const data = await gql(`{
-    tournaments(first: ${first}${cursor}, sortBy: PLAYERS) {
-      pageInfo { hasNextPage endCursor }
-      edges {
-        node {
-          TID
-          entries {
-            player { topdeckProfile name }
+  const data = await gql(
+    `query GetTournaments($first: Int!, $after: String) {
+      tournaments(first: $first, after: $after, sortBy: PLAYERS) {
+        pageInfo { hasNextPage endCursor }
+        edges {
+          node {
+            TID
+            entries {
+              player { topdeckProfile name }
+            }
           }
         }
       }
-    }
-  }`);
+    }`,
+    { first, after: after ?? null }
+  );
   const conn = data?.data?.tournaments;
   return {
     tournaments: conn?.edges?.map((e: { node: TournamentListEntry }) => e.node) ?? [],

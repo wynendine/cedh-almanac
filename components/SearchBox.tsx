@@ -13,6 +13,7 @@ export default function SearchBox() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Result[]>([]);
   const [open, setOpen] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -21,14 +22,22 @@ export default function SearchBox() {
     if (query.length < 2) {
       setResults([]);
       setOpen(false);
+      setSearching(false);
       return;
     }
     if (debounce.current) clearTimeout(debounce.current);
+    setSearching(true);
     debounce.current = setTimeout(async () => {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      setResults(data);
-      setOpen(true);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        setResults(Array.isArray(data) ? data : []);
+        setOpen(true);
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
     }, 250);
   }, [query]);
 
@@ -40,6 +49,8 @@ export default function SearchBox() {
     });
   }
 
+  const showDropdown = open && (searching || results.length > 0 || query.length < 2);
+
   return (
     <div className="relative w-full max-w-lg">
       <input
@@ -50,20 +61,29 @@ export default function SearchBox() {
         className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none disabled:opacity-60"
         disabled={isPending}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        onFocus={() => results.length > 0 && setOpen(true)}
+        onFocus={() => (results.length > 0 || searching) && setOpen(true)}
       />
-      {open && results.length > 0 && (
+      {query.length === 1 && (
+        <p className="mt-2 text-xs text-zinc-500 text-center">Type at least 2 characters to search.</p>
+      )}
+      {query.length >= 2 && open && (
         <ul className="absolute z-10 mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl">
-          {results.map((r) => (
-            <li
-              key={r.profile}
-              onMouseDown={() => select(r.profile)}
-              className="flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-zinc-800"
-            >
-              <span className="text-white">{r.name}</span>
-              <span className="text-xs text-zinc-500">{r.tournaments} tournaments</span>
-            </li>
-          ))}
+          {searching ? (
+            <li className="px-4 py-3 text-sm text-zinc-500">Searching…</li>
+          ) : results.length === 0 ? (
+            <li className="px-4 py-3 text-sm text-zinc-500">No players found.</li>
+          ) : (
+            results.map((r) => (
+              <li
+                key={r.profile}
+                onMouseDown={() => select(r.profile)}
+                className="flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-zinc-800"
+              >
+                <span className="text-white">{r.name}</span>
+                <span className="text-xs text-zinc-500">{r.tournaments} tournaments</span>
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>

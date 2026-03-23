@@ -17,10 +17,7 @@ interface Opponent {
 type SortCol = "winPct" | "lossPct" | "drawPct";
 type SortDir = "desc" | "asc" | null;
 
-function pct(n: number | null) {
-  if (n === null) return "—";
-  return `${(n * 100).toFixed(1)}%`;
-}
+import { pct } from "@/lib/utils";
 
 function nextDir(current: SortDir): SortDir {
   if (current === null) return "desc";
@@ -79,6 +76,11 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
           <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Draw %", "drawPct")}</div>
         </div>
         <div className="divide-y divide-zinc-700">
+          {sorted.length === 0 && (
+            <div className="px-4 py-6 text-center text-sm text-zinc-500">
+              No opponents with 3+ games played together.
+            </div>
+          )}
           {sorted.map((opp) => (
             <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] items-stretch bg-zinc-900 px-4">
               <div className="min-w-0 py-3">
@@ -125,6 +127,13 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-800">
+            {sorted.length === 0 && (
+              <tr>
+                <td colSpan={8} className="px-4 py-6 text-center text-sm text-zinc-500">
+                  No opponents with 3+ games played together.
+                </td>
+              </tr>
+            )}
             {sorted.map((opp) => (
               <tr key={opp.profile} className="hover:bg-zinc-900">
                 <td className="px-4 py-2 font-medium">
