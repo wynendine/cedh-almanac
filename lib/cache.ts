@@ -1,4 +1,4 @@
-import { put, list, del } from "@vercel/blob";
+import { put, list, del, get } from "@vercel/blob";
 import { PlayerStats } from "./compute";
 
 const PLAYER_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -9,14 +9,26 @@ export interface PlayerIndexEntry {
   tournaments: number;
 }
 
-async function fetchBlob(url: string): Promise<unknown> {
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-    },
-  });
-  if (!res.ok) return null;
-  return res.json();
+async function readBlob(url: string): Promise<unknown> {
+  const result = await get(url, { access: "private" });
+  if (!result || result.statusCode !== 200) return null;
+  const stream = result.stream;
+  const chunks: Uint8Array[] = [];
+  const reader = stream.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
+  }
+  const text = new TextDecoder().decode(
+    chunks.reduce((acc, chunk) => {
+      const merged = new Uint8Array(acc.length + chunk.length);
+      merged.set(acc);
+      merged.set(chunk, acc.length);
+      return merged;
+    }, new Uint8Array(0))
+  );
+  return JSON.parse(text);
 }
 
 // --- Player stats cache ---
@@ -27,7 +39,7 @@ export async function getCachedPlayer(profile: string): Promise<PlayerStats | nu
     if (!blobs.length) return null;
     const blob = blobs[0];
     if (Date.now() - new Date(blob.uploadedAt).getTime() > PLAYER_TTL_MS) return null;
-    return (await fetchBlob(blob.url)) as PlayerStats | null;
+    return (await readBlob(blob.url)) as PlayerStats | null;
   } catch {
     return null;
   }
@@ -49,7 +61,7 @@ export async function getPlayerIndex(): Promise<PlayerIndexEntry[]> {
   try {
     const { blobs } = await list({ prefix: "index-players" });
     if (!blobs.length) return [];
-    return (await fetchBlob(blobs[0].url)) as PlayerIndexEntry[];
+    return (await readBlob(blobs[0].url)) as PlayerIndexEntry[];
   } catch {
     return [];
   }
