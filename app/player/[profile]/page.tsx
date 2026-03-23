@@ -114,9 +114,10 @@ export default async function PlayerPage({
                     {opp.games} games
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="text-indigo-400 font-semibold">{pct(opp.winPct)}</div>
-                  <div className="text-xs text-zinc-500">win rate</div>
+                <div className="text-right shrink-0 text-xs space-y-0.5">
+                  <div><span className="text-zinc-500">W </span><span className="text-green-400 font-semibold">{pct(opp.winPct)}</span></div>
+                  <div><span className="text-zinc-500">L </span><span className="text-red-400 font-semibold">{pct(opp.lossPct)}</span></div>
+                  <div><span className="text-zinc-500">D </span><span className="text-yellow-400 font-semibold">{pct(opp.drawPct)}</span></div>
                 </div>
               </div>
             ))}
