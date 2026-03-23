@@ -2,6 +2,7 @@ import { put, list, del, get } from "@vercel/blob";
 import { PlayerStats } from "./compute";
 
 const PLAYER_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const CACHE_VERSION = 2; // bump when cached data shape or logic changes
 
 export interface PlayerIndexEntry {
   name: string;
@@ -39,7 +40,9 @@ export async function getCachedPlayer(profile: string): Promise<PlayerStats | nu
     if (!blobs.length) return null;
     const blob = blobs[0];
     if (Date.now() - new Date(blob.uploadedAt).getTime() > PLAYER_TTL_MS) return null;
-    return (await readBlob(blob.url)) as PlayerStats | null;
+    const data = (await readBlob(blob.url)) as (PlayerStats & { v?: number }) | null;
+    if (!data || data.v !== CACHE_VERSION) return null;
+    return data;
   } catch {
     return null;
   }
@@ -49,7 +52,7 @@ export async function setCachedPlayer(stats: PlayerStats): Promise<void> {
   try {
     const { blobs } = await list({ prefix: `player-${stats.profile}` });
     if (blobs.length) await del(blobs.map((b) => b.url));
-    await put(`player-${stats.profile}.json`, JSON.stringify(stats), { access: "private" });
+    await put(`player-${stats.profile}.json`, JSON.stringify({ ...stats, v: CACHE_VERSION }), { access: "private" });
   } catch {
     // fail silently
   }
