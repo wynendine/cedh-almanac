@@ -69,7 +69,7 @@ export default async function PlayerPage({
         {/* Header */}
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <a href="/" className="text-zinc-500 hover:text-white text-sm shrink-0">← Search</a>
+            <a href="/" className="text-zinc-500 hover:text-white text-sm shrink-0">← Back</a>
             <SearchBox />
           </div>
           <h1 className="text-3xl font-bold">{stats.name}</h1>
