@@ -123,7 +123,6 @@ export default async function PlayerPage({
 
         {/* Opponents */}
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
           <OpponentTable opponents={opponents} />
           <p className="mt-2 text-xs text-zinc-600">
             Cached {new Date(stats.cachedAt).toLocaleString()}

@@ -75,8 +75,10 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
 
   return (
     <>
-      {/* Min games filter */}
-      <div className="mb-3 relative inline-block">
+      {/* Heading + filter */}
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
+      <div className="relative inline-block">
         <button
           onClick={() => setFilterOpen((o) => !o)}
           className="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs text-zinc-300 hover:text-white transition-colors"
@@ -101,6 +103,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
             ))}
           </div>
         )}
+      </div>
       </div>
 
       {/* Mobile list */}
