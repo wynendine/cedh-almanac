@@ -41,7 +41,8 @@ export default async function PlayerPage({
   const stats = await fetchStats(profile);
   if (!stats) notFound();
 
-  const { overall, byseat, opponents } = stats;
+  const { overall, byseat } = stats;
+  const opponents = stats.opponents.filter((o) => o.games >= 3);
   const totalGames = overall.wins + overall.losses + overall.draws;
 
   return (
