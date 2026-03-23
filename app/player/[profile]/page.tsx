@@ -113,14 +113,14 @@ export default async function PlayerPage({
                     <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                       {opp.name}
                     </a>
-                    <div className="mt-0.5 text-xs text-zinc-500">
-                      <span className="text-green-400">{opp.wins}W</span>
+                    <div className="mt-0.5 text-xs text-white">
+                      <span className="text-green-400 text-sm font-semibold">{opp.wins}W</span>
                       {" · "}
-                      <span className="text-red-400">{opp.losses}L</span>
+                      <span className="text-red-400 text-sm font-semibold">{opp.losses}L</span>
                       {" · "}
-                      <span className="text-yellow-400">{opp.draws}D</span>
+                      <span className="text-yellow-400 text-sm font-semibold">{opp.draws}D</span>
                       {" · "}
-                      {opp.games}g
+                      {opp.games} games played
                     </div>
                   </div>
                   <div className="text-right text-sm font-semibold">{pct(opp.winPct)}</div>
