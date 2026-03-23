@@ -18,7 +18,7 @@ interface Opponent {
 type SortCol = "winPct" | "lossPct" | "drawPct";
 type SortDir = "desc" | "asc" | null;
 
-const MIN_GAMES_OPTIONS = [1, 3, 5];
+const MIN_GAMES_OPTIONS = [1, 3, 5, 10];
 
 function nextDir(current: SortDir): SortDir {
   if (current === null) return "desc";
@@ -36,6 +36,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
   const [sortCol, setSortCol] = useState<SortCol | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>(null);
   const [minGames, setMinGames] = useState(3);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   function handleSort(col: SortCol) {
     if (sortCol === col) {
@@ -75,21 +76,31 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
   return (
     <>
       {/* Min games filter */}
-      <div className="mb-3 flex items-center gap-2 text-sm text-zinc-400">
-        <span>Min games:</span>
-        {MIN_GAMES_OPTIONS.map((n) => (
-          <button
-            key={n}
-            onClick={() => setMinGames(n)}
-            className={`rounded px-2 py-0.5 text-xs font-medium transition-colors ${
-              minGames === n
-                ? "bg-indigo-600 text-white"
-                : "bg-zinc-800 text-zinc-400 hover:text-white"
-            }`}
-          >
-            {n}+
-          </button>
-        ))}
+      <div className="mb-3 relative inline-block">
+        <button
+          onClick={() => setFilterOpen((o) => !o)}
+          className="flex items-center gap-1.5 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs text-zinc-300 hover:text-white transition-colors"
+        >
+          <span>Min games: {minGames}+</span>
+          <span className="text-zinc-500">{filterOpen ? "▲" : "▼"}</span>
+        </button>
+        {filterOpen && (
+          <div className="absolute left-0 top-full mt-1 z-10 rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl overflow-hidden">
+            {MIN_GAMES_OPTIONS.map((n) => (
+              <button
+                key={n}
+                onClick={() => { setMinGames(n); setFilterOpen(false); }}
+                className={`block w-full px-4 py-2 text-left text-xs transition-colors ${
+                  minGames === n
+                    ? "bg-indigo-600 text-white"
+                    : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                }`}
+              >
+                {n}+ games
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Mobile list */}
