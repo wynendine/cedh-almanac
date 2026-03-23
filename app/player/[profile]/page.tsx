@@ -21,13 +21,13 @@ async function fetchStats(profile: string): Promise<PlayerStats | null> {
   const roundsByTid = await getRoundsBatch(tids);
   const stats = computeStats(profile, player.name, roundsByTid);
 
-  if (stats.overall.wins === 0 && stats.overall.losses === 0) {
-    stats.overall.wins = player.wins;
-    stats.overall.losses = player.losses;
-    stats.overall.draws = player.draws;
-    const total = player.wins + player.losses + player.draws;
-    stats.overall.winRate = total > 0 ? player.wins / total : null;
-  }
+  // Always use edhtop16's overall totals — they include tournaments
+  // that topdeck's rounds API doesn't expose.
+  stats.overall.wins = player.wins;
+  stats.overall.losses = player.losses;
+  stats.overall.draws = player.draws;
+  const total = player.wins + player.losses + player.draws;
+  stats.overall.winRate = total > 0 ? player.wins / total : null;
 
   await setCachedPlayer(stats);
   return stats;
