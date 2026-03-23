@@ -75,3 +75,20 @@ export async function setPlayerIndex(entries: PlayerIndexEntry[]): Promise<void>
   if (blobs.length) await del(blobs.map((b) => b.url));
   await put("index-players.json", JSON.stringify(entries), { access: "private" });
 }
+
+// Updates a single player's entry in the index with an accurate tournament count.
+// Called after fetching fresh player stats so counts stay correct over time.
+export async function updatePlayerIndexEntry(profile: string, name: string, tournaments: number): Promise<void> {
+  try {
+    const entries = await getPlayerIndex();
+    const idx = entries.findIndex((e) => e.profile === profile);
+    if (idx === -1) {
+      entries.push({ profile, name, tournaments });
+    } else {
+      entries[idx] = { profile, name, tournaments };
+    }
+    await setPlayerIndex(entries);
+  } catch {
+    // fail silently — index update is best-effort
+  }
+}

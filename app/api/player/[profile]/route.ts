@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPlayer } from "@/lib/edhtop16";
 import { getRoundsBatch } from "@/lib/topdeck";
 import { computeStats } from "@/lib/compute";
-import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
+import { getCachedPlayer, setCachedPlayer, updatePlayerIndexEntry } from "@/lib/cache";
 
 export const maxDuration = 60;
 
@@ -33,5 +33,6 @@ export async function GET(
   stats.overall.winRate = total > 0 ? player.wins / total : null;
 
   await setCachedPlayer(stats);
+  updatePlayerIndexEntry(profile, player.name, player.entries.length).catch(() => {});
   return NextResponse.json(stats);
 }

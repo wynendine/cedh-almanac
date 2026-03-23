@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getPlayer } from "@/lib/edhtop16";
 import { getRoundsBatch } from "@/lib/topdeck";
 import { computeStats, PlayerStats } from "@/lib/compute";
-import { getCachedPlayer, setCachedPlayer } from "@/lib/cache";
+import { getCachedPlayer, setCachedPlayer, updatePlayerIndexEntry } from "@/lib/cache";
 import { pct } from "@/lib/utils";
 import OpponentTable from "@/components/OpponentTable";
 import SearchBox from "@/components/SearchBox";
@@ -48,6 +48,8 @@ async function fetchStats(profile: string): Promise<PlayerStats | null> {
   stats.overall.winRate = total > 0 ? player.wins / total : null;
 
   await setCachedPlayer(stats);
+  // Best-effort: update the search index with the accurate tournament count.
+  updatePlayerIndexEntry(profile, player.name, player.entries.length).catch(() => {});
   return stats;
 }
 
