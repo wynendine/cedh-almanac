@@ -78,10 +78,10 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
           <div className="border-l border-zinc-700 pl-2">{colHeader("Loss%", "lossPct")}</div>
           <div className="border-l border-zinc-700 pl-2">{colHeader("Draw%", "drawPct")}</div>
         </div>
-        <div className="divide-y divide-zinc-800">
+        <div className="divide-y divide-zinc-700">
           {sorted.map((opp) => (
-            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] items-center bg-zinc-900 px-4 py-3">
-              <div className="min-w-0">
+            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] items-stretch bg-zinc-900 px-4">
+              <div className="min-w-0 py-3">
                 <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                   {opp.name}
                 </a>
@@ -95,9 +95,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
                   <span className="text-sm font-semibold">{opp.games} games</span>
                 </div>
               </div>
-              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.winPct)}</div>
-              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.lossPct)}</div>
-              <div className="text-center text-sm font-semibold border-l border-zinc-800">{pct(opp.drawPct)}</div>
+              <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.winPct)}</div>
+              <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.lossPct)}</div>
+              <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.drawPct)}</div>
             </div>
           ))}
         </div>
