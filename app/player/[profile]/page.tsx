@@ -96,31 +96,39 @@ export default async function PlayerPage({
         <section>
           <h2 className="mb-3 text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
 
-          {/* Mobile cards */}
-          <div className="sm:hidden space-y-px rounded-lg overflow-hidden border border-zinc-800">
-            {opponents.map((opp) => (
-              <div key={opp.profile} className="flex items-center justify-between bg-zinc-900 px-4 py-3 gap-4">
-                <div className="min-w-0">
-                  <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
-                    {opp.name}
-                  </a>
-                  <div className="mt-0.5 text-xs text-zinc-500">
-                    <span className="text-green-400">{opp.wins}W</span>
-                    {" · "}
-                    <span className="text-red-400">{opp.losses}L</span>
-                    {" · "}
-                    <span className="text-yellow-400">{opp.draws}D</span>
-                    {" · "}
-                    {opp.games} games
+          {/* Mobile list */}
+          <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
+            {/* Header */}
+            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
+              <div>Opponent</div>
+              <div className="text-right">Win%</div>
+              <div className="text-right">Loss%</div>
+              <div className="text-right">Draw%</div>
+            </div>
+            {/* Rows */}
+            <div className="divide-y divide-zinc-800">
+              {opponents.map((opp) => (
+                <div key={opp.profile} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-4 items-center bg-zinc-900 px-4 py-3">
+                  <div className="min-w-0">
+                    <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
+                      {opp.name}
+                    </a>
+                    <div className="mt-0.5 text-xs text-zinc-500">
+                      <span className="text-green-400">{opp.wins}W</span>
+                      {" · "}
+                      <span className="text-red-400">{opp.losses}L</span>
+                      {" · "}
+                      <span className="text-yellow-400">{opp.draws}D</span>
+                      {" · "}
+                      {opp.games}g
+                    </div>
                   </div>
+                  <div className="text-right text-sm font-semibold">{pct(opp.winPct)}</div>
+                  <div className="text-right text-sm font-semibold">{pct(opp.lossPct)}</div>
+                  <div className="text-right text-sm font-semibold">{pct(opp.drawPct)}</div>
                 </div>
-                <div className="text-right shrink-0 text-xs flex flex-col justify-between self-stretch py-0.5">
-                  <div><span className="text-zinc-500">Win </span><span className="text-white font-semibold">{pct(opp.winPct)}</span></div>
-                  <div><span className="text-zinc-500">Loss </span><span className="text-white font-semibold">{pct(opp.lossPct)}</span></div>
-                  <div><span className="text-zinc-500">Draw </span><span className="text-white font-semibold">{pct(opp.drawPct)}</span></div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Desktop table */}
