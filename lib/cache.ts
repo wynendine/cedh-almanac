@@ -2,7 +2,7 @@ import { put, list, del, get } from "@vercel/blob";
 import { PlayerStats } from "./compute";
 
 const PLAYER_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-const CACHE_VERSION = 2; // bump when cached data shape or logic changes
+const CACHE_VERSION = 3; // bump when cached data shape or logic changes
 
 export interface PlayerIndexEntry {
   name: string;
