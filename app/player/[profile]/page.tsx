@@ -114,10 +114,10 @@ export default async function PlayerPage({
                     {opp.games} games
                   </div>
                 </div>
-                <div className="text-right shrink-0 text-xs space-y-0.5">
-                  <div><span className="text-zinc-500">W </span><span className="text-green-400 font-semibold">{pct(opp.winPct)}</span></div>
-                  <div><span className="text-zinc-500">L </span><span className="text-red-400 font-semibold">{pct(opp.lossPct)}</span></div>
-                  <div><span className="text-zinc-500">D </span><span className="text-yellow-400 font-semibold">{pct(opp.drawPct)}</span></div>
+                <div className="text-right shrink-0 text-xs flex flex-col justify-between self-stretch py-0.5">
+                  <div><span className="text-zinc-500">Win </span><span className="text-white font-semibold">{pct(opp.winPct)}</span></div>
+                  <div><span className="text-zinc-500">Loss </span><span className="text-white font-semibold">{pct(opp.lossPct)}</span></div>
+                  <div><span className="text-zinc-500">Draw </span><span className="text-white font-semibold">{pct(opp.drawPct)}</span></div>
                 </div>
               </div>
             ))}
