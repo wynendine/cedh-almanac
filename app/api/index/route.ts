@@ -18,8 +18,8 @@ async function buildIndex() {
   let cursor: string | null = null;
   let hasNext = true;
   let pages = 0;
-  const PAGE_SIZE = 100;
-  const MAX_PAGES = 120; // up to 12,000 tournaments
+  const PAGE_SIZE = 500;
+  const MAX_PAGES = 25; // up to 12,500 tournaments
 
   while (hasNext && pages < MAX_PAGES) {
     const { tournaments, hasNextPage, endCursor } = await getTournamentPage(PAGE_SIZE, cursor ?? undefined);
