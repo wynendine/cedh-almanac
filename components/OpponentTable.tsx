@@ -92,7 +92,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
                   {" · "}
                   <span className="text-yellow-400 text-sm font-semibold">{opp.draws}D</span>
                   {" · "}
-                  {opp.games} games
+                  <span className="text-sm font-semibold">{opp.games} games</span>
                 </div>
               </div>
               <div className="text-center text-sm font-semibold">{pct(opp.winPct)}</div>
