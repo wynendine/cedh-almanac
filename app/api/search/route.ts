@@ -3,7 +3,7 @@ import { getPlayerIndex } from "@/lib/cache";
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.toLowerCase().trim() ?? "";
-  if (q.length < 2) return NextResponse.json([]);
+  if (q.length < 1) return NextResponse.json([]);
 
   const index = await getPlayerIndex();
   const results = index

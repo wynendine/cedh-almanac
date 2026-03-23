@@ -19,7 +19,7 @@ export default function SearchBox() {
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (query.length < 2) {
+    if (query.length < 1) {
       setResults([]);
       setOpen(false);
       setSearching(false);
@@ -63,10 +63,7 @@ export default function SearchBox() {
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onFocus={() => (results.length > 0 || searching) && setOpen(true)}
       />
-      {query.length === 1 && (
-        <p className="mt-2 text-xs text-zinc-500 text-center">Type at least 2 characters to search.</p>
-      )}
-      {query.length >= 2 && open && (
+      {query.length >= 1 && open && (
         <ul className="absolute z-10 mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl">
           {searching ? (
             <li className="px-4 py-3 text-sm text-zinc-500">Searching…</li>
