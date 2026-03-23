@@ -5,6 +5,15 @@ import { setPlayerIndex, PlayerIndexEntry } from "@/lib/cache";
 export const maxDuration = 60;
 
 export async function POST(_req: NextRequest) {
+  try {
+    return await buildIndex();
+  } catch (err) {
+    console.error("Index build failed:", err);
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}
+
+async function buildIndex() {
 const playerMap: Record<string, { name: string; tournaments: number }> = {};
   let cursor: string | null = null;
   let hasNext = true;
