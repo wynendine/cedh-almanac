@@ -82,7 +82,7 @@ export default async function PlayerPage({
             {[1, 2, 3, 4].map((seat) => {
               const s = byseat[String(seat)];
               return (
-                <div key={seat} className="rounded-lg bg-zinc-900 p-4 text-center">
+                <div key={seat} className="rounded-lg bg-zinc-900 p-4 flex flex-col items-center text-center">
                   <div className="text-xs text-zinc-500 mb-1">Seat {seat}</div>
                   <div className="text-2xl font-bold text-indigo-400">{pct(s?.winRate ?? null)}</div>
                   <div className="mt-1 text-xs text-zinc-500">{s?.wins ?? 0}W / {s?.games ?? 0} games</div>
@@ -99,16 +99,16 @@ export default async function PlayerPage({
           {/* Mobile list */}
           <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
             {/* Header */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
+            <div className="grid grid-cols-[1fr_4rem_4rem_4rem] gap-x-2 bg-zinc-800 px-4 py-2 text-xs text-zinc-400">
               <div>Opponent</div>
-              <div className="text-right">Win%</div>
-              <div className="text-right">Loss%</div>
-              <div className="text-right">Draw%</div>
+              <div className="text-center">Win%</div>
+              <div className="text-center">Loss%</div>
+              <div className="text-center">Draw%</div>
             </div>
             {/* Rows */}
             <div className="divide-y divide-zinc-800">
               {opponents.map((opp) => (
-                <div key={opp.profile} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-2 items-center bg-zinc-900 px-4 py-3">
+                <div key={opp.profile} className="grid grid-cols-[1fr_4rem_4rem_4rem] gap-x-2 items-center bg-zinc-900 px-4 py-3">
                   <div className="min-w-0">
                     <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                       {opp.name}
@@ -123,9 +123,9 @@ export default async function PlayerPage({
                       {opp.games} games played
                     </div>
                   </div>
-                  <div className="text-right text-sm font-semibold">{pct(opp.winPct)}</div>
-                  <div className="text-right text-sm font-semibold">{pct(opp.lossPct)}</div>
-                  <div className="text-right text-sm font-semibold">{pct(opp.drawPct)}</div>
+                  <div className="text-center text-sm font-semibold">{pct(opp.winPct)}</div>
+                  <div className="text-center text-sm font-semibold">{pct(opp.lossPct)}</div>
+                  <div className="text-center text-sm font-semibold">{pct(opp.drawPct)}</div>
                 </div>
               ))}
             </div>
