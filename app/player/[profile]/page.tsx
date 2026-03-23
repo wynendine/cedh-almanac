@@ -95,7 +95,43 @@ export default async function PlayerPage({
         {/* Opponents */}
         <section>
           <h2 className="mb-3 text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
-          <div className="overflow-x-auto rounded-lg border border-zinc-800">
+
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-2">
+            {opponents.map((opp) => (
+              <div key={opp.profile} className="rounded-lg bg-zinc-900 px-4 py-3">
+                <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 block mb-2">
+                  {opp.name}
+                </a>
+                <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                  <div>
+                    <div className="text-green-400 font-bold text-base">{opp.wins}</div>
+                    <div className="text-zinc-500">W</div>
+                  </div>
+                  <div>
+                    <div className="text-red-400 font-bold text-base">{opp.losses}</div>
+                    <div className="text-zinc-500">L</div>
+                  </div>
+                  <div>
+                    <div className="text-yellow-400 font-bold text-base">{opp.draws}</div>
+                    <div className="text-zinc-500">D</div>
+                  </div>
+                  <div>
+                    <div className="text-zinc-300 font-bold text-base">{opp.games}</div>
+                    <div className="text-zinc-500">Games</div>
+                  </div>
+                </div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs text-zinc-400">
+                  <div>Win% <span className="text-white">{pct(opp.winPct)}</span></div>
+                  <div>Loss% <span className="text-white">{pct(opp.lossPct)}</span></div>
+                  <div>Draw% <span className="text-white">{pct(opp.drawPct)}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto rounded-lg border border-zinc-800">
             <table className="w-full text-sm">
               <thead className="bg-zinc-900 text-zinc-400">
                 <tr>
