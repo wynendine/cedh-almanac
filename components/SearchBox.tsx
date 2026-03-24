@@ -38,7 +38,7 @@ export default function SearchBox() {
       } finally {
         setSearching(false);
       }
-    }, 250);
+    }, 150);
   }, [query]);
 
   function select(profile: string) {

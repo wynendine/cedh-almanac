@@ -37,6 +37,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
   const [sortDir, setSortDir] = useState<SortDir>(null);
   const [minGames, setMinGames] = useState(3);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   function handleSort(col: SortCol) {
     if (sortCol === col) {
@@ -50,7 +51,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
   }
 
   const sorted = useMemo(() => {
-    const filtered = opponents.filter((o) => o.games >= minGames);
+    const filtered = opponents.filter(
+      (o) => o.games >= minGames && (o.winPct !== null || o.lossPct !== null || o.drawPct !== null)
+    );
     if (!sortCol || !sortDir) return filtered;
     return [...filtered].sort((a, b) => {
       const av = a[sortCol] ?? -1;
@@ -75,9 +78,40 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
 
   return (
     <>
+      {/* Info modal */}
+      {infoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={() => setInfoOpen(false)}>
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="relative z-10 max-w-sm rounded-xl border border-zinc-700 bg-zinc-900 p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-2 font-semibold text-white">How percentages are calculated</h3>
+            <p className="text-sm text-zinc-300 leading-relaxed">
+              <span className="text-red-400 font-medium">Loss %</span> only counts games where that specific opponent won the match. Games where a third player at the table won are not counted as a loss against that opponent.
+            </p>
+            <button
+              onClick={() => setInfoOpen(false)}
+              className="mt-4 rounded-lg bg-zinc-800 px-4 py-1.5 text-sm text-zinc-300 hover:text-white"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Heading + filter */}
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-zinc-300">Results vs Opponents</h2>
+          <button
+            onClick={() => setInfoOpen(true)}
+            className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 text-xs text-zinc-400 hover:border-zinc-400 hover:text-white"
+            aria-label="How percentages are calculated"
+          >
+            i
+          </button>
+        </div>
       <div className="relative inline-block">
         <button
           onClick={() => setFilterOpen((o) => !o)}
@@ -108,8 +142,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
 
       {/* Mobile list */}
       <div className="sm:hidden rounded-lg overflow-hidden border border-zinc-800">
-        <div className="grid grid-cols-[1fr_3rem_3rem_3rem] bg-zinc-800 px-4 py-2 text-xs">
+        <div className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem] bg-zinc-800 px-4 py-2 text-xs">
           <div className="text-zinc-400">Opponent</div>
+          <div className="border-l border-zinc-700 flex items-center justify-center text-zinc-400">G</div>
           <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Win %", "winPct")}</div>
           <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Loss %", "lossPct")}</div>
           <div className="border-l border-zinc-700 flex items-center justify-center">{colHeader("Draw %", "drawPct")}</div>
@@ -121,7 +156,7 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
             </div>
           )}
           {sorted.map((opp) => (
-            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem] items-stretch bg-zinc-900 px-4">
+            <div key={opp.profile} className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem] items-stretch bg-zinc-900 px-4">
               <div className="min-w-0 py-3">
                 <a href={`/player/${opp.profile}`} className="font-medium hover:text-indigo-400 truncate block">
                   {opp.name}
@@ -132,10 +167,9 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
                   <span className="text-red-400 text-sm font-semibold">{opp.losses}L</span>
                   {" · "}
                   <span className="text-yellow-400 text-sm font-semibold">{opp.draws}D</span>
-                  {" · "}
-                  <span className="text-sm font-semibold">{opp.games} games</span>
                 </div>
               </div>
+              <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700 text-zinc-400">{opp.games}</div>
               <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.winPct)}</div>
               <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.lossPct)}</div>
               <div className="flex items-center justify-center text-sm font-semibold border-l border-zinc-700">{pct(opp.drawPct)}</div>
@@ -154,13 +188,13 @@ export default function OpponentTable({ opponents }: { opponents: Opponent[] }) 
               <th className="px-4 py-3 text-right">L</th>
               <th className="px-4 py-3 text-right">D</th>
               <th className="px-4 py-3 text-right">Games</th>
-              <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("winPct")}>
+              <th className="w-20 px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("winPct")}>
                 Win %{sortCol === "winPct" ? arrow(sortDir) : ""}
               </th>
-              <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("lossPct")}>
+              <th className="w-20 px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("lossPct")}>
                 Loss %{sortCol === "lossPct" ? arrow(sortDir) : ""}
               </th>
-              <th className="px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("drawPct")}>
+              <th className="w-20 px-4 py-3 text-right cursor-pointer hover:text-white select-none" onClick={() => handleSort("drawPct")}>
                 Draw %{sortCol === "drawPct" ? arrow(sortDir) : ""}
               </th>
             </tr>
