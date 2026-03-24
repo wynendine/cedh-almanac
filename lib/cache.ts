@@ -64,16 +64,22 @@ export async function getPlayerIndex(): Promise<PlayerIndexEntry[]> {
   try {
     const { blobs } = await list({ prefix: "index-players" });
     if (!blobs.length) return [];
-    return (await readBlob(blobs[0].url)) as PlayerIndexEntry[];
+    // Pick the newest blob in case a previous partial write left duplicates
+    const newest = blobs.sort(
+      (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    )[0];
+    return (await readBlob(newest.url)) as PlayerIndexEntry[];
   } catch {
     return [];
   }
 }
 
 export async function setPlayerIndex(entries: PlayerIndexEntry[]): Promise<void> {
+  // Write new blob first so the index is never absent if the delete fails
+  const newBlob = await put("index-players.json", JSON.stringify(entries), { access: "private" });
   const { blobs } = await list({ prefix: "index-players" });
-  if (blobs.length) await del(blobs.map((b) => b.url));
-  await put("index-players.json", JSON.stringify(entries), { access: "private" });
+  const toDelete = blobs.map((b) => b.url).filter((url) => url !== newBlob.url);
+  if (toDelete.length) await del(toDelete);
 }
 
 // Updates a single player's entry in the index with an accurate tournament count.
