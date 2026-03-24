@@ -81,6 +81,8 @@ export async function setPlayerIndex(entries: PlayerIndexEntry[]): Promise<void>
 export async function updatePlayerIndexEntry(profile: string, name: string, tournaments: number): Promise<void> {
   try {
     const entries = await getPlayerIndex();
+    // Bail out if the index looks empty or corrupt — never write back a tiny index
+    if (entries.length < 100) return;
     const idx = entries.findIndex((e) => e.profile === profile);
     if (idx === -1) {
       entries.push({ profile, name, tournaments });
